@@ -260,6 +260,22 @@ RAM gap_periConnectParams_t my_periConnParameters = {DEF_CON_INERVAL, DEF_CON_IN
 static u32 serviceChangeVal = 0; // uint16 1..65535 "Start of Affected Attribute Handle Range", uint16 1..65535 "End of Affected Attribute Handle Range"
 static u16 serviceChangeCCC = 0;
 
+// LIBRE EMULATION
+static const u16 my_libre_ServiceUUID = 0x2345;
+static const u8 my_libreReceiveUUID[16] = {0xE4, 0xCC, 0xDB, 0xE2, 0x2A, 0x2A, 0xB4, 0x81, 0xE9, 0x11, 0x89, 0xEF, 0x7A, 0x17, 0x98, 0x08};
+static const u16 my_libreWriteUUID = 0xF001;
+static const u8 my_libreReceiveCharVal[19] = {
+    CHAR_PROP_READ | CHAR_PROP_NOTIFY,
+    U16_LO(LibreReceive_Data_DP_H), U16_HI(LibreReceive_Data_DP_H),
+    0xE4, 0xCC, 0xDB, 0xE2, 0x2A, 0x2A, 0xB4, 0x81, 0xE9, 0x11, 0x89, 0xEF, 0x7A, 0x17, 0x98, 0x08
+};
+static const u8 my_libreWriteCharVal[5] = {
+    CHAR_PROP_WRITE_WITHOUT_RSP,
+    U16_LO(LibreWrite_Data_DP_H), U16_HI(LibreWrite_Data_DP_H),
+    0xF0, 0x01
+};
+RAM u16 LibreReceiveValueInCCC;
+
 //////////////////////// Battery /////////////////////////////////////////////////
 static const u16 my_batServiceUUID        = SERVICE_UUID_BATTERY;
 static const u16 my_batCharUUID       	  = CHARACTERISTIC_UUID_BATTERY_LEVEL;
@@ -484,6 +500,14 @@ RAM attribute_t my_Attributes[] = {
 	//Mi 0x95FE
 	{2,ATT_PERMISSIONS_READ, 2,2,(u8*)(&my_primaryServiceUUID),(u8*)(&mi_primary_service_uuid), 0},
 		{0,ATT_PERMISSIONS_READ, 2,sizeof (my_MiName),(u8*)(&userdesc_UUID),(u8*)(my_MiName), 0},
+	// Libre emulation
+	{4, ATT_PERMISSIONS_READ, 2, 2, (u8*)(&my_primaryServiceUUID), (u8*)(&my_libre_ServiceUUID), 0},
+		{0, ATT_PERMISSIONS_READ, 2, sizeof(my_libreReceiveCharVal), (u8*)(&my_characterUUID), (u8*)(my_libreReceiveCharVal), 0},
+		{0, ATT_PERMISSIONS_RDWR, 16, sizeof(my_libreReceiveData), (u8*)(&my_libreReceiveUUID), (u8*)&my_libreReceiveData, &LibreWrite, 0},
+		{0, ATT_PERMISSIONS_RDWR, 2, sizeof(LibreReceiveValueInCCC), (u8*)(&clientCharacterCfgUUID), (u8*)(&LibreReceiveValueInCCC), 0},
+	{3, ATT_PERMISSIONS_READ, 2, 2, (u8*)(&my_primaryServiceUUID), (u8*)(&my_libreWriteUUID), 0},
+		{0, ATT_PERMISSIONS_WRITE, 2, sizeof(my_libreWriteCharVal), (u8*)(&my_characterUUID), (u8*)(my_libreWriteCharVal), 0},
+		{0, ATT_PERMISSIONS_RDWR, 2, sizeof(my_libreWriteData), (u8*)(&my_libreWriteUUID), (u8*)(&my_libreWriteData), 0},
 };
 
 void my_att_init(void) {

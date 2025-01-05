@@ -53,6 +53,8 @@ extern u16 temp2ValueInCCC;
 extern u16 humiValueInCCC;
 extern u16 anaValueInCCC;
 extern u16 RxTxValueInCCC;
+extern u16 LibreReceiveValueInCCC;
+
 
 #define SEND_BUFFER_SIZE	(ATT_MTU_SIZE-3) // = 20
 extern uint8_t send_buf[SEND_BUFFER_SIZE];
@@ -181,6 +183,15 @@ typedef enum
 	Mi_PS_H, 								//UUID: 2800, 	VALUE: 0xFE95 service uuid
 	Mi_CMD_OUT_DESC_H,						//UUID: 2901, 	VALUE: my_MiName
 
+	LibreReceive_PS_H,
+	LibreReceive_Data_CD_H,
+	LibreReceive_Data_DP_H,
+	LibreReceive_Data_DESC_H,
+
+	LibreWrite_Data_PS_H,
+	LibreWrite_Data_CD_H,
+	LibreWrite_Data_DP_H,
+
 	ATT_END_H
 
 } ATT_HANDLE;
@@ -215,9 +226,15 @@ void set_pvvx_adv_data(void);
 void set_atc_adv_data(void);
 void set_mi_adv_data(void);
 
+int LibreWrite(void * p);
+
 #if (DEV_SERVICES & SERVICE_LE_LR)
 void load_adv_data(void);
 #endif
+
+inline void ble_send_libre(void) {
+	bls_att_pushNotifyData(LibreReceive_Data_DP_H, (u8 *) &my_libreReceiveData, sizeof(my_libreReceiveData));
+}
 
 #if (DEV_SERVICES & (SERVICE_THS | SERVICE_18B20 | SERVICE_PLM))
 inline void ble_send_temp01(void) {

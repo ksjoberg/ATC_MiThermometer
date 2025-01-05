@@ -238,6 +238,10 @@ typedef struct _measured_data_t {
 #endif
 extern measured_data_t measured_data;
 
+// Libre emulation
+extern u8 my_libreReceiveData[4];
+extern u8 my_libreWriteData[4];
+
 typedef union {
 	uint8_t all_flgs;
 	struct {
