@@ -262,6 +262,10 @@ _attribute_ram_code_ int RxTxWrite(void * p) {
 	return 0;
 }
 
+_attribute_ram_code_ int LibreWrite(void * p) {
+	cmd_parser(p);
+	return 0;
+}
 /* moved app.c: suspend_exit_cb
 _attribute_ram_code_ void user_set_rf_power(u8 e, u8 *p, int n) {
 	(void) e; (void) p; (void) n;

@@ -42,6 +42,10 @@
 
 void app_enter_ota_mode(void);
 
+// Libre emulation
+RAM u8 my_libreReceiveData[4];  // Example buffer size, adjust as needed
+RAM u8 my_libreWriteData[4];
+
 RAM measured_data_t measured_data;
 RAM work_flg_t wrk;
 
@@ -533,6 +537,7 @@ void read_sensors(void) {
 			// TODO: measured_data.humi_x1 = (measured_data.xtemp[1] + 50)/ 100;
 #endif
 #endif
+my_libreReceiveData[0]++;
 #if (DEV_SERVICES & SERVICE_TH_TRG)
 			set_trigger_out();
 #endif
@@ -1070,6 +1075,9 @@ void main_loop(void) {
 					if (temp2ValueInCCC)
 						ble_send_temp001();
 #endif
+					if (LibreReceiveValueInCCC)
+						ble_send_libre();
+						
 #if (DEV_SERVICES & (SERVICE_THS | SERVICE_PLM))
 					if (humiValueInCCC)
 						ble_send_humi();
