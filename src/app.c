@@ -89,11 +89,11 @@ const cfg_t def_cfg = {
 		.flg2.adv_flags = true,
 		.advertising_interval = 40, // multiply by 62.5 ms = 2.5 sec
 		.flg.comfort_smiley = true,
-		.measure_interval = 4, // * advertising_interval = 10 sec
+		.measure_interval = 24, // * advertising_interval = 60 sec
 		.min_step_time_update_lcd = 49, //x0.05 sec,   2.45 sec
 		.hw_ver = HW_VER_LYWSD03MMC_B14,
 #if (DEV_SERVICES & SERVICE_HISTORY)
-		.averaging_measurements = 180, // * measure_interval = 10 * 180 = 1800 sec = 30 minutes
+		.averaging_measurements = 30, // * measure_interval = 60 * 30 = 1800 sec = 30 minutes
 #endif
 #elif DEVICE_TYPE == DEVICE_MHO_C401
 		.flg2.adv_flags = true,
