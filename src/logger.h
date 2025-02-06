@@ -43,6 +43,8 @@ typedef struct _memo_rd_t {
 	memo_inf_t saved;
 	u32 cnt;
 	u32 cur;
+	bool (*stop_condition)(const memo_blk_t *blk, void *user_data);
+    void *user_data;
 }memo_rd_t;
 
 typedef struct _memo_head_t {
@@ -55,7 +57,7 @@ extern memo_inf_t memo;
 
 void memo_init(void);
 void clear_memo(void);
-unsigned get_memo(u32 bnum, pmemo_blk_t p);
+unsigned get_memo(memo_rd_t* ctx, pmemo_blk_t p);
 void write_memo(void);
 
 #endif // #if (DEV_SERVICES & SERVICE_HISTORY)

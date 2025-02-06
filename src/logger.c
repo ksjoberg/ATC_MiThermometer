@@ -177,12 +177,14 @@ void clear_memo(void) {
 
 //_attribute_ram_code_
 __attribute__((optimize("-Os")))
-unsigned get_memo(u32 bnum, pmemo_blk_t p) {
+unsigned get_memo(memo_rd_t* ctx, pmemo_blk_t p) {
 	memo_head_t mhs;
 	u32 faddr;
-	faddr = rd_memo.saved.faddr & (~(FLASH_SECTOR_SIZE-1));
-	if (bnum > rd_memo.saved.cnt_cur_sec) {
-		bnum -= rd_memo.saved.cnt_cur_sec;
+	u32 bnum;
+	faddr = ctx->saved.faddr & (~(FLASH_SECTOR_SIZE-1));
+	bnum = ctx->cur;
+	if (bnum > ctx->saved.cnt_cur_sec) {
+		bnum -= ctx->saved.cnt_cur_sec;
 		faddr -= FLASH_SECTOR_SIZE;
 		if (faddr < MEMO_START_ADDR)
 			faddr = MEMO_END_ADDR - FLASH_SECTOR_SIZE;
@@ -197,11 +199,15 @@ unsigned get_memo(u32 bnum, pmemo_blk_t p) {
 		if (mhs.id != MEMO_SEC_ID || mhs.flg != 0)
 			return 0;
 	} else {
-		bnum = rd_memo.saved.cnt_cur_sec - bnum;
+		bnum = ctx->saved.cnt_cur_sec - bnum;
 	}
 	faddr += sizeof(memo_head_t); // смещение в секторе
 	faddr += bnum * sizeof(memo_blk_t); // * size memo
 	_flash_read(faddr, sizeof(memo_blk_t), p);
+	
+	if (ctx->stop_condition && ctx->stop_condition(p, ctx->user_data)) {
+    	return 0;
+	}
 	return 1;
 }
 

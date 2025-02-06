@@ -844,7 +844,7 @@ void ble_send_trg_flg(void) {
 __attribute__((optimize("-Os")))
 void send_memo_blk(void) {
 	send_buf[0] = CMD_ID_LOGGER;
-	if (++rd_memo.cur > rd_memo.cnt || (!get_memo(rd_memo.cur, (pmemo_blk_t)&send_buf[3]))) {
+	if (++rd_memo.cur > rd_memo.cnt || (!get_memo(&rd_memo, (pmemo_blk_t)&send_buf[3]))) {
 		send_buf[1] = 0;
 		send_buf[2] = 0;
 		bls_att_pushNotifyData(RxTx_CMD_OUT_DP_H, send_buf, 3);

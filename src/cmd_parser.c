@@ -37,6 +37,20 @@
 #if (DEV_SERVICES & SERVICE_TIME_ADJUST)
 RAM u32 utc_set_time_sec; // clock setting time for delta calculation
 #endif
+#if (DEV_SERVICES & SERVICE_HISTORY)
+RAM uint32_t utc_read_memos_since;
+bool stop_if_before_timestamp(const memo_blk_t *blk, void *user_data)
+{
+    // user_data points to a uint32_t that holds our cutoff time
+    uint32_t cutoff = *(uint32_t *)user_data;
+
+    // If the block's time is older than the cutoff, stop
+    if (blk->time < cutoff) {
+        return true;  // trigger "stop"
+    }
+    return false;     // keep going
+}
+#endif
 
 #if (DEV_SERVICES & SERVICE_MI_KEYS)
 
@@ -574,6 +588,17 @@ void cmd_parser(void * p) {
 #if (DEV_SERVICES & SERVICE_HISTORY)
 		} else if (cmd == CMD_ID_LOGGER && len > 2) { // Read memory measures
 			rd_memo.cnt = req->dat[1] | (req->dat[2] << 8);
+
+			if (len > 8) {
+				memcpy(&utc_read_memos_since, &req->dat[5], len);
+				utc_read_memos_since = utc_time_sec - utc_read_memos_since;
+				rd_memo.stop_condition = stop_if_before_timestamp;
+				rd_memo.user_data = &utc_read_memos_since; 
+			} else {
+				rd_memo.stop_condition = NULL;
+				rd_memo.user_data = NULL;
+			}
+
 			if (rd_memo.cnt) {
 				rd_memo.saved = memo;
 				if (len > 4)
